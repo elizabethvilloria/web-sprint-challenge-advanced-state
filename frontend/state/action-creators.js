@@ -28,6 +28,42 @@ export function postAnswer() {
     // - Dispatch an action to set the server message to state
     // - Dispatch the fetching of the next quiz
   }
+
+// export function postQuiz() {
+//   return function (dispatch) {
+//     // On successful POST:
+//     // - Dispatch the correct message to the the appropriate state
+//     // - Dispatch the resetting of the form
+//   }
+// }
+
+export function postQuiz(payload) {
+  return async function (dispatch) {
+    try {
+      console.log('Sending API request with payload:', payload);
+      const response = await axios.post('http://localhost:9000/api/quiz/new', payload);
+
+      if (response.status === 201) {
+        const quizData = response.data; // The newly created quiz object
+        console.log('Quiz successfully created:', quizData);
+
+        // Dispatch the correct message to the state
+        dispatch(setMessage('Quiz successfully created'));
+
+        // Optionally, you can dispatch an action to reset the form
+        dispatch(resetForm());
+
+        // After successfully creating the quiz, fetch it immediately
+        dispatch(fetchQuiz()); // Fetch the newly created quiz
+      } else if (response.status === 422) {
+        // Handle error for malformed payload
+        const errorMessage = response.data.reason || 'Malformed client payload';
+        console.error('Malformed client payload:', errorMessage);
+        dispatch(setMessage(errorMessage));
+      } else {
+        // Handle other status codes or generic errors
+        console.error('An error occurred:', response.status);
+        dispatch(setMessage('An error occurred.'));
 }
 export function postQuiz() {
   return function (dispatch) {
